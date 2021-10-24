@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: zuul-server  # 服务名
+
+server:
+  port: 9999   # 端口
+
+# Eureka
+eureka:
+  instance:
+    prefer-ip-address: true  # 是否使用 ip 地址注册
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}  # ip:port
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+
+# 路由规则
+zuul:
+  routes:
+    product-service:   #  路由 id 自定义
+      path: /product-service/**     # 配置请求 url 的映射路径
+      serviceId: product-service    # 根据 serverId 自动从注册中心获取服务地址，并转发
+    order-service:
+      path: /order-service/**
+      serviceId: order-service    # 根据 serverId 自动从注册中心获取服务地址，并转发
+  prefix: /api   # 前缀：统一进入网管后的地址都会加上
+
+#  ignored-services: order-service   # 根据服务名排除相关模块请求  多个用 ","隔开  *代表所有
+#  ignored-patterns: /**/order/**    # 路由排除 - URL排除 - 所有对order的访问都无效
