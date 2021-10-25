@@ -20,11 +20,25 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/{id}")
-    public Product selectProductById(@PathVariable("id") Integer id){
+    public Product selectProductById(@PathVariable("id") Integer id) {
+        // 设置睡眠，测试超时处理
+        try {
+            Thread.sleep(2000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return productService.selectProductById(id);
     }
 
-
-
+    /**
+     * 用于测试 Hystrix自定义限流策略，针对不是Restful风格的接口
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/single")
+    public Product selectProductBySingle(Integer id) {
+        return productService.selectProductById(id);
+    }
 
 }

@@ -3,9 +3,9 @@ package com.yibao.zuulserver.filter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
  * @create 2021 -10 -24 -23:07
  */
 @Component
-public class CustomFilter extends ZuulFilter {
+public class AccessFilter extends ZuulFilter {
     // 日志
     private static final Logger logger = LoggerFactory.getLogger(ZuulFilter.class);
 
@@ -61,6 +61,9 @@ public class CustomFilter extends ZuulFilter {
      */
     @Override
     public Object run() throws ZuulException {
+        // 模拟异常
+//        Integer.parseInt("zuul");
+
         // 获取请求上下文
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
@@ -72,14 +75,14 @@ public class CustomFilter extends ZuulFilter {
             // 请求结束
             context.setSendZuulResponse(false);
             // 响应状态码 -- 401 无访问权限
-            context.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+            context.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
             // 响应类型
             context.getResponse().setContentType("application/json;charset=utf-8");
             PrintWriter writer = null;
             try {
                 writer = context.getResponse().getWriter();
                 // 响应内容
-                writer.print(HttpStatus.SC_UNAUTHORIZED);
+                writer.print("AccessFilter -- message: "+HttpStatus.UNAUTHORIZED.getReasonPhrase());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

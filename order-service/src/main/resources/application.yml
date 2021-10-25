@@ -12,3 +12,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+
+# Ribbon超时设置，建议小于 Hystrix
+ribbon:
+  ConnectTimeout: 5000     # 请求连接的超时时间，默认 1s
+  ReadTimeout: 5000        # 请求处理的超时时间，默认 1s
+  MaxAutoRetries: 1        # 访问服务集群下原节点
+  MaxAutoRetriesNextServer: 1    # 访问服务集群下其余节点
+  OkToRetryOnAllOperations: true   # Ribbon 开启重试

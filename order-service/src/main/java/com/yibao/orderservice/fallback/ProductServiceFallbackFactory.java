@@ -2,7 +2,7 @@ package com.yibao.orderservice.fallback;
 
 import com.yibao.orderservice.entity.Product;
 import com.yibao.orderservice.service.ProductService;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**

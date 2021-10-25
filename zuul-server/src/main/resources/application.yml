@@ -1,6 +1,11 @@
 spring:
   application:
     name: zuul-server  # 服务名
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
+#    database: 0
+#    password:
 
 server:
   port: 9999   # 端口
@@ -25,5 +30,51 @@ zuul:
       serviceId: order-service    # 根据 serverId 自动从注册中心获取服务地址，并转发
   prefix: /api   # 前缀：统一进入网管后的地址都会加上
 
+  # 服务限流
+  ratelimit:
+    # 开启限流保护
+    enabled: true
+    # 限流数据存储方式
+    repository: REDIS
+    # 自定义配置，局部生效
+    policy-list:
+      # 指定限流的服务名称
+      product-service:
+        - limit: 5
+          refresh-interval: 60   #  60s内超过5次请求，则捕获异常
+          type:
+            - origin
+            - url
+            - user
+
+  # 禁用 zuul 默认的异常处理 filter (采用自己写的error过滤器)
+  SendErrorFilter:
+    error:
+      disable: true
+  # 开启 zuul 的重试机制
+  retryable: true
+
 #  ignored-services: order-service   # 根据服务名排除相关模块请求  多个用 ","隔开  *代表所有
 #  ignored-patterns: /**/order/**    # 路由排除 - URL排除 - 所有对order的访问都无效
+
+# 开启 Hystrix 度量监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream,health,info,routes
+# Hystrix 超时设置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000    # 线程池隔离，默认1s
+# Ribbon超时设置，建议小于 Hystrix
+ribbon:
+  ConnectTimeout: 5000     # 请求连接的超时时间，默认 1s
+  ReadTimeout: 5000        # 请求处理的超时时间，默认 1s
+  MaxAutoRetries: 1        # 访问服务集群下原节点
+  MaxAutoRetriesNextServer: 1    # 访问服务集群下其余节点
+  OkToRetryOnAllOperations: true   # Ribbon 开启重试
